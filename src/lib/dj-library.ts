@@ -15,22 +15,30 @@ export interface DJTrack {
   setRole: string;
 }
 
+interface StoredTrack {
+  id?: unknown; title?: unknown; artist?: unknown; cover?: unknown;
+  bpm?: unknown; key?: unknown; energy?: unknown; elements?: unknown;
+  tags?: unknown; mixTip?: unknown; mixNote?: unknown; review?: unknown; setRole?: unknown;
+}
+
 export function readLibrary(value: string | null): DJTrack[] {
   if (!value) return [];
   try {
     const data = JSON.parse(value);
     if (!Array.isArray(data.tracks)) return [];
-    return data.tracks.filter((track: Record<string, unknown>) => track && typeof track.id === "string" && typeof track.title === "string" && typeof track.artist === "string").map((track: Record<string, unknown>) => ({
+    return data.tracks.filter((track: StoredTrack) => track && typeof track.id === "string" && typeof track.title === "string" && typeof track.artist === "string").map((track: StoredTrack) => {
+      const elements = track.elements ?? track.tags;
+      return ({
       id: String(track.id), title: String(track.title), artist: String(track.artist),
       cover: typeof track.cover === "string" && /^(https:\/\/|data:image\/)/.test(track.cover) ? track.cover : null,
       bpm: track.bpm !== null && track.bpm !== "" && Number.isFinite(Number(track.bpm)) && Number(track.bpm) > 0 ? Number(track.bpm) : null,
       key: typeof track.key === "string" ? track.key : "",
       energy: Number.isInteger(track.energy) && Number(track.energy) >= 1 && Number(track.energy) <= 5 ? Number(track.energy) : null,
-      elements: Array.isArray(track.elements ?? track.tags) ? (track.elements ?? track.tags as unknown[] as unknown) as string[] : [],
+      elements: Array.isArray(elements) ? elements.filter((tag): tag is string => typeof tag === "string") : [],
       mixTip: typeof (track.mixTip ?? track.mixNote) === "string" ? String(track.mixTip ?? track.mixNote) : "",
       review: typeof track.review === "string" ? track.review : "",
       setRole: typeof track.setRole === "string" ? track.setRole : "",
-    })).map((track: DJTrack) => ({ ...track, elements: track.elements.filter((tag) => typeof tag === "string") }));
+    }); });
   } catch { return []; }
 }
 
