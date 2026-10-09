@@ -21,8 +21,7 @@ export function MusicWorkspace() {
         const article = articles.find(element => element.getAttribute("aria-label") === `${track.title}, ${track.artist}. Abrir detalhes`);
         const artwork = article?.querySelector("svg");
         if (!artwork) return track;
-        const copy = artwork.cloneNode(true);
-        if (!(copy instanceof SVGElement)) return track;
+        const copy = document.importNode(artwork, true);
         copy.setAttribute("xmlns", "http://www.w3.org/2000/svg");
         return { ...track, cover: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(copy))}` };
       }));
