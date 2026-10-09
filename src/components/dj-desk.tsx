@@ -17,7 +17,7 @@ function Energy({ value }: { value: number | null }) {
   return <span className="dj-energy" aria-label={`Energia ${value} de 5`}>{[1, 2, 3, 4, 5].map(n => <i key={n} data-active={n <= value} />)}<small>{value}</small></span>;
 }
 
-export function DJDesk({ tracks }: { tracks: DJTrack[] }) {
+export function DJDesk({ tracks, onSelect }: { tracks: DJTrack[]; onSelect:(track:DJTrack)=>void }) {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sort, setSort] = useState<"title" | "bpm">("title");
@@ -32,6 +32,7 @@ export function DJDesk({ tracks }: { tracks: DJTrack[] }) {
   const matchIds = new Set(matches.map(track => track.id));
   const bpms = tracks.flatMap(track => track.bpm === null ? [] : [track.bpm]);
   function changeSort(column: "title" | "bpm") { if (sort === column) setDescending(!descending); else { setSort(column); setDescending(false); } }
+  function selectTrack(track:DJTrack){setSelectedId(track.id);onSelect(track);}
   return <div className="dj-desk">
     <header className="dj-heading">
       <div><div className="dj-eyebrow"><Headphones size={14} /> PERFORMANCE WORKSPACE</div><h1>DJ Desk<span className="dj-live-dot" /></h1><p>Seu acervo. Outra frequência.</p></div>
@@ -41,9 +42,9 @@ export function DJDesk({ tracks }: { tracks: DJTrack[] }) {
       <section className="dj-collection" aria-label="Acervo DJ">
         <div className="dj-toolbar"><div className="dj-collection-label"><Music2 size={17} /><h2>Acervo</h2><span>{visible.length}</span></div><label className="dj-search"><Search size={16} /><input aria-label="Buscar no acervo" type="search" placeholder="Buscar faixa, artista ou tom" value={query} onChange={event => setQuery(event.target.value)} /></label></div>
         {selected && <div className="dj-match-strip"><Radio size={14} /><span>{matches.length} {matches.length === 1 ? "transição compatível" : "transições compatíveis"} com <strong>{selected.title}</strong></span><Button variant="ghost" size="icon" title="Limpar seleção" aria-label="Limpar seleção" onClick={() => setSelectedId(null)}><X /></Button></div>}
-        <div className="dj-table-scroll"><table className="dj-table"><thead><tr><th className="dj-index">#</th><th><Button variant="ghost" size="sm" onClick={() => changeSort("title")}>Faixa / Artista {sort === "title" ? descending ? <ArrowDown /> : <ArrowUp /> : <ArrowUpDown />}</Button></th><th><Button variant="ghost" size="sm" onClick={() => changeSort("bpm")}>BPM {sort === "bpm" ? descending ? <ArrowDown /> : <ArrowUp /> : <ArrowUpDown />}</Button></th><th>Tom</th><th>Energia</th><th>Elementos</th><th>Dica de mixagem</th></tr></thead><tbody>{visible.map((track, index) => <tr key={track.id} data-selected={track.id === selectedId} data-match={matchIds.has(track.id)} onClick={() => setSelectedId(track.id)}>
+        <div className="dj-table-scroll"><table className="dj-table"><thead><tr><th className="dj-index">#</th><th><Button variant="ghost" size="sm" onClick={() => changeSort("title")}>Faixa / Artista {sort === "title" ? descending ? <ArrowDown /> : <ArrowUp /> : <ArrowUpDown />}</Button></th><th><Button variant="ghost" size="sm" onClick={() => changeSort("bpm")}>BPM {sort === "bpm" ? descending ? <ArrowDown /> : <ArrowUp /> : <ArrowUpDown />}</Button></th><th>Tom</th><th>Energia</th><th>Elementos</th><th>Dica de mixagem</th></tr></thead><tbody>{visible.map((track, index) => <tr key={track.id} data-selected={track.id === selectedId} data-match={matchIds.has(track.id)} onClick={() => selectTrack(track)}>
           <td className="dj-index">{track.id === selectedId ? <AudioLines size={16} /> : String(index + 1).padStart(2, "0")}</td>
-          <td><div className="dj-track-cell"><Cover track={track} /><div><Button variant="ghost" className="dj-track-title" onClick={(event) => { event.stopPropagation(); setSelectedId(track.id); }}>{track.title}</Button><span>{track.artist}</span></div>{matchIds.has(track.id) && <span className="dj-match-indicator" title="BPM e harmonia compatíveis"><Radio size={13} /></span>}</div></td>
+          <td><div className="dj-track-cell"><Cover track={track} /><div><Button variant="ghost" className="dj-track-title" onClick={(event) => { event.stopPropagation(); selectTrack(track); }}>{track.title}</Button><span>{track.artist}</span></div>{matchIds.has(track.id) && <span className="dj-match-indicator" title="BPM e harmonia compatíveis"><Radio size={13} /></span>}</div></td>
           <td><span className="dj-bpm">{track.bpm ?? "—"}</span></td><td><KeyBadge value={track.key} /></td><td><Energy value={track.energy} /></td>
           <td><div className="dj-tags">{track.elements.length ? track.elements.map(tag => <span key={tag}>{tag}</span>) : <span className="dj-missing">—</span>}</div></td><td className="dj-mix-tip">{track.mixTip || <span className="dj-missing">—</span>}</td>
         </tr>)}</tbody></table></div>
