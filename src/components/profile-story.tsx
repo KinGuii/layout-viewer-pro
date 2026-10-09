@@ -7,6 +7,7 @@ export function ProfileStory({open,onOpenChange,name,avatar,streak,symbol,xp,tag
  const art=useRef<HTMLDivElement>(null);const [message,setMessage]=useState('');
  async function exportImage(copy:boolean) {
   try {
+   await document.fonts.ready;
    const svg=art.current?.querySelector('svg');if(!svg)return;
    const clone=svg.cloneNode(true) as SVGElement;
    const originals=[svg,...Array.from(svg.querySelectorAll('*'))];const copies=[clone,...Array.from(clone.querySelectorAll('*'))];
@@ -15,7 +16,7 @@ export function ProfileStory({open,onOpenChange,name,avatar,streak,symbol,xp,tag
    const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(clone)],{type:'image/svg+xml'}));const img=new Image();img.src=url;await img.decode();
    const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1920;const ctx=canvas.getContext('2d');if(!ctx)return;
    const root=art.current;if(!root)return;const theme=getComputedStyle(root);ctx.fillStyle=theme.getPropertyValue('--background').trim();ctx.fillRect(0,0,1080,1920);ctx.fillStyle=theme.getPropertyValue('--foreground').trim();ctx.textAlign='center';ctx.font='500 34px sans-serif';ctx.fillText('MUSIC DESK PRO',540,150);ctx.save();ctx.beginPath();ctx.arc(540,600,235,0,Math.PI*2);ctx.clip();ctx.drawImage(img,305,365,470,470);ctx.restore();URL.revokeObjectURL(url);
-   ctx.font='600 64px sans-serif';const safeName=name.length>24?`${name.slice(0,23)}…`:name;ctx.fillText(safeName,540,970,920);ctx.font='52px sans-serif';ctx.fillText(`${symbol} ${streak} dias de frequência`,540,1100);ctx.font='500 42px sans-serif';ctx.fillText(`${xp} XP · Sua escuta deixa marcas`,540,1200);ctx.font='36px sans-serif';tags.forEach((tag,i)=>ctx.fillText(tag,540,1370+i*70,920));ctx.font='28px sans-serif';ctx.fillText('NA SUA FREQUÊNCIA.',540,1790);
+   ctx.font='600 64px sans-serif';const safeName=name.length>24?`${name.slice(0,23)}…`:name;ctx.fillText(safeName,540,970,920);ctx.font='52px "Noto Color Emoji", sans-serif';ctx.fillText(`${symbol} ${streak} dias de frequência`,540,1100);ctx.font='500 42px sans-serif';ctx.fillText(`${xp} XP · Sua escuta deixa marcas`,540,1200);ctx.font='36px sans-serif';tags.forEach((tag,i)=>ctx.fillText(tag,540,1370+i*70,920));ctx.font='28px sans-serif';ctx.fillText('NA SUA FREQUÊNCIA.',540,1790);
    const blob=await new Promise<Blob|null>(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)return;
    if(copy&&navigator.clipboard&&typeof ClipboardItem!=='undefined'){try{await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);setMessage('Imagem copiada.');return;}catch{setMessage('Cópia indisponível. Imagem baixada.');}}
    const download=URL.createObjectURL(blob);const a=document.createElement('a');a.href=download;a.download='music-desk-story.png';a.click();URL.revokeObjectURL(download);setMessage('Cartão baixado.');
