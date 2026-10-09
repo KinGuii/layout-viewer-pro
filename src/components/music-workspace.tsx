@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRightLeft, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DJDesk } from "@/components/dj-desk";
@@ -9,6 +9,9 @@ export function MusicWorkspace() {
   const [tracks, setTracks] = useState<DJTrack[]>([]);
   const iframe = useRef<HTMLIFrameElement>(null);
   const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (iframe.current?.contentDocument?.readyState === "complete") setReady(true);
+  }, []);
   function activateDJ() {
     try { setTracks(readLibrary(iframe.current?.contentWindow?.localStorage.getItem(LIBRARY_STORAGE_KEY) ?? null)); }
     catch { setTracks([]); }
