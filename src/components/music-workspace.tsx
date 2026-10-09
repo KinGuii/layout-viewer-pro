@@ -30,7 +30,7 @@ export function MusicWorkspace() {
    const raw=JSON.parse(iframe.current?.contentWindow?.localStorage.getItem(LIBRARY_STORAGE_KEY)??'{}');
    const next:ProfileLibrary={tracks:Array.isArray(raw.tracks)?raw.tracks:[],logDays:Array.isArray(raw.logDays)?raw.logDays:[]};setLibrary(next);
    const own=next.tracks.filter(t=>!t.sample),ids=own.map(t=>t.id),reviews=own.filter(t=>t.review?.trim()).map(t=>`${t.id}:${t.review}`);
-   if(baseline.current){if(ids.some(id=>!baseline.current?.ids.includes(id)))award('track');if(reviews.some(review=>!baseline.current?.reviews.includes(review)))award('review');}baseline.current={ids,reviews};
+   if(baseline.current){if(ids.some(id=>!baseline.current?.ids.includes(id))){award('track');award('catalog');}if(reviews.some(review=>!baseline.current?.reviews.includes(review)))award('review');}baseline.current={ids,reviews};
    const days=[...next.logDays,...activityRef.current.map(a=>a.day)];const count=streakDays(days,new Date());
    const number=streakButton?.querySelector('span:not([aria-hidden])');if(number&&number.textContent!==String(count))number.textContent=String(count);
    if(count>=3)award('streak');
@@ -45,7 +45,7 @@ export function MusicWorkspace() {
  },[]);
  useEffect(()=>{if(ready)sync();},[engagement,ready,sync]);
  useEffect(()=>{
-  if(!ready)return;const doc=iframe.current?.contentDocument;if(!doc)return;sync();const observer=new MutationObserver(sync);observer.observe(doc.body,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-current']});
+  if(!ready)return;const doc=iframe.current?.contentDocument;if(!doc)return;sync();const observer=new MutationObserver(sync);observer.observe(doc.body,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-current']});const timer=setInterval(sync,1500);
   function click(event:Event){const target=event.target as Element|null;if(!target||typeof target.closest!=='function')return;
    const nav=target.closest('nav[aria-label="Navegação principal"] button');const buttons=Array.from(doc?.querySelectorAll('nav[aria-label="Navegação principal"] button')??[]);
    if(nav===buttons[3]){event.preventDefault();event.stopImmediatePropagation();setProfileMode(true);return;}
@@ -56,10 +56,10 @@ export function MusicWorkspace() {
    const title=article.querySelector('h3')?.textContent??trackId.split(',')[0]??'',artist=article.querySelector('p')?.textContent??'';
    let stored:Record<string,unknown>|undefined;try{const raw=JSON.parse(iframe.current?.contentWindow?.localStorage.getItem(LIBRARY_STORAGE_KEY)??'{}');stored=raw.tracks?.find((t:Record<string,unknown>)=>t['title']===title&&t['artist']===artist);}catch{}
    const svg=article.querySelector('svg');let cover=typeof stored?.['cover']==='string'?stored['cover']:null;if(!cover&&svg){const copy=document.importNode(svg,true);copy.setAttribute('xmlns','http://www.w3.org/2000/svg');cover=`data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(copy))}`;}
-   const audio=stored?.['previewUrl']??stored?.['audioUrl'];setPlayer({id:typeof stored?.['id']==='string'?stored['id']:trackId,title,artist,cover,...(typeof audio==='string'&&/^https:\/\//.test(audio)?{audioUrl:audio}:{})});if(stored?.['sample']||!stored)award('catalog');sync();
+   const audio=stored?.['previewUrl']??stored?.['audioUrl'];setPlayer({id:typeof stored?.['id']==='string'?stored['id']:trackId,title,artist,cover,...(typeof audio==='string'&&/^https:\/\//.test(audio)?{audioUrl:audio}:{})});sync();
   }
   function keyboard(event:KeyboardEvent){const target=event.target as Element|null;if(target?.closest('[aria-label="Music Desk — ir para Diário"]')&&(event.key==='Enter'||event.key===' ')){event.preventDefault();(target.closest('[role="button"]') as HTMLElement|null)?.click();}}
-  doc.addEventListener('click',click,true);doc.addEventListener('keydown',keyboard,true);return()=>{observer.disconnect();doc.removeEventListener('click',click,true);doc.removeEventListener('keydown',keyboard,true);};
+  doc.addEventListener('click',click,true);doc.addEventListener('keydown',keyboard,true);return()=>{clearInterval(timer);observer.disconnect();doc.removeEventListener('click',click,true);doc.removeEventListener('keydown',keyboard,true);};
  },[ready,sync,award]);
  async function saveProfile(next:ProfileData){const previous=profile;setProfile(next);activityRef.current=next.activity;persistEngagement({...engagementRef.current,avatar:next.avatar});if(!userId)return true;const {error}=await supabase.from('profiles').upsert({id:userId,...next,activity:JSON.parse(JSON.stringify(next.activity)),events:JSON.parse(JSON.stringify(next.events))});if(error){setProfile(previous);persistEngagement({...engagementRef.current,avatar:previous.avatar});return false;}return true;}
  function activateDJ(){try{const data=readLibrary(iframe.current?.contentWindow?.localStorage.getItem(LIBRARY_STORAGE_KEY)??null);const articles=Array.from(iframe.current?.contentDocument?.querySelectorAll('article[aria-label]')??[]);setTracks(data.map(track=>{if(track.cover)return track;const artwork=articles.find(e=>e.getAttribute('aria-label')===`${track.title}, ${track.artist}. Abrir detalhes`)?.querySelector('svg');if(!artwork)return track;const copy=document.importNode(artwork,true);copy.setAttribute('xmlns','http://www.w3.org/2000/svg');return {...track,cover:`data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(copy))}`};}));}catch{setTracks([]);}setDjMode(true);}
@@ -67,8 +67,8 @@ export function MusicWorkspace() {
   {djMode&&<div className="workspace-switch-bar"><div className="workspace-current"><Headphones size={16}/><Button variant="ghost" onClick={()=>navigate(0)}>Music Desk <strong>PRO</strong></Button><span>{FREQUENCY_SYMBOLS[engagement.symbol]?.emoji} {streakDays([...library.logDays,...profile.activity.map(a=>a.day)],new Date())}</span></div><Button variant="outline" size="sm" onClick={()=>setDjMode(false)}><ArrowLeft/>Voltar para Curadoria</Button></div>}
   <iframe ref={iframe} src="/music-desk-pro.html" title="Music Desk Pro — Curadoria" className="curation-frame" hidden={djMode||profileMode} onLoad={()=>{setReady(true);sync();}} allow="autoplay; microphone; clipboard-write; fullscreen"/>
   {!djMode&&profileMode&&<><MusicProfile profile={profile} onSave={saveProfile} library={library} onDJ={activateDJ} onHome={()=>navigate(0)} signedIn={Boolean(userId)} engagement={engagement} onSymbol={symbol=>persistEngagement({...engagementRef.current,symbol})} onMission={award}/><nav className="profile-nav profile-theme" aria-label="Navegação principal">{[{label:'Diário',Icon:Disc3},{label:'Workstation',Icon:SlidersHorizontal},{label:'Setlab',Icon:ListMusic},{label:'Perfil',Icon:UserRound}].map(({label,Icon},i)=><Button variant="ghost" key={label} onClick={()=>navigate(i)} aria-current={i===3?'page':undefined}><Icon size={22}/><span>{label}</span></Button>)}</nav></>}
-  {djMode&&<DJDesk tracks={tracks}/>}
-  {player&&!djMode&&<MiniPlayer track={player} onClose={()=>setPlayer(null)} onMessage={notify}/>}
+  {djMode&&<DJDesk tracks={tracks} onSelect={track=>setPlayer({id:track.id,title:track.title,artist:track.artist,cover:track.cover})}/>}
+  {player&&!djMode&&<MiniPlayer track={player} onClose={()=>setPlayer(null)} onMessage={notify} onPlayed={()=>award('catalog')}/>}
   {toast&&<div className="profile-toast profile-theme" role="status"><span>✦</span>{toast}</div>}
  </div>;
 }
