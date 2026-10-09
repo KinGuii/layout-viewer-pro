@@ -8,3 +8,9 @@
 - [x] Mover acesso ao DJ Desk para a Página 4 e preservar navegação e acervo.
 - [x] Implementar identidade com nove avatares, hábitos e conquistas reais.
 - [x] Adicionar curiosidade diária, shows e exportação ao calendário; verificar fluxos.
+
+# Atualização integrada
+- [ ] Corrigir logo e Perfil, preservando o iframe e o acervo.
+- [ ] Adicionar artes abstratas, símbolo persistente e missões com XP testado.
+- [ ] Atualizar agenda conceitual, mini player e cartão de Stories.
+- [ ] Verificar navegação, persistência e apresentação em telas pequenas e grandes.
