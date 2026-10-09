@@ -12,3 +12,6 @@
 - Keep the original Curadoria iframe mounted across workspace switches; this preserves its live state and existing storage behavior.
 - DJ Desk reads the existing library storage without writing to it; missing technical metadata stays unknown rather than being fabricated.
 - Keep Camelot normalization and transition filtering in the browser-safe dj-library module so matching rules are independently testable.
+- Render the personal profile as a sibling of the preserved iframe when its fourth tab is selected; bridge navigation through the existing tab buttons to avoid modifying the compiled library app.
+- Persist personal identity, exploration activity and event radar in owner-scoped Cloud profiles; guest edits are session-only previews and never alter the existing library storage.
+- Keep habit, badge, daily editorial rotation and calendar export rules in the browser-safe music-profile module so behavior is independently testable.

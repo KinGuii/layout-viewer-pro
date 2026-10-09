@@ -4,10 +4,10 @@ import { MusicWorkspace } from "@/components/music-workspace";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Music Desk Pro — Curadoria & DJ Desk" },
-      { name: "description", content: "Seu diário musical e acervo profissional, com DJ Desk e radar de transições por BPM e harmonia." },
-      { property: "og:title", content: "Music Desk Pro — Curadoria & DJ Desk" },
-      { property: "og:description", content: "Alterne entre Curadoria e DJ Desk e encontre transições compatíveis no seu acervo." },
+      { title: "Music Desk Pro — Diário, Perfil Musical & DJ Desk" },
+      { name: "description", content: "Seu diário e perfil musical pessoal: identidade, frequência de escuta, curiosidades, shows e DJ Desk com radar de transições." },
+      { property: "og:title", content: "Music Desk Pro — Diário, Perfil Musical & DJ Desk" },
+      { property: "og:description", content: "Sua identidade musical, hábitos e shows em um só Perfil, com acesso ao DJ Desk e ao seu acervo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
