@@ -34,9 +34,9 @@ export function curatorLevel(xp: number) {
   const names = ['Ouvinte Curioso', 'Explorador de Texturas', 'Garimpador Noturno'];
   return { level, name: names[Math.min(level - 1, names.length - 1)], progress: Math.max(0, xp) % 100, next: level * 100 };
 }
-export interface TextureTrack { sample?: boolean; textures?: string[]; tags?: string[]; elements?: string[]; review?: string }
+export interface TextureTrack { sample?: boolean; textures?: string[]; tags?: string[]; elements?: string[]; mood?: string; review?: string }
 export function recentTextures(tracks: TextureTrack[]) {
-  return [...new Set(tracks.filter(t => !t.sample).flatMap(t => t.textures ?? t.tags ?? t.elements ?? []).filter(v => typeof v === 'string' && v.trim()))].slice(-3);
+  return [...new Set(tracks.filter(t => !t.sample).flatMap(t => t.textures ?? t.tags ?? t.elements ?? (t.mood ? [t.mood] : [])).filter(v => typeof v === 'string' && v.trim()))].slice(-3);
 }
 export const CONCEPT_EVENTS = [
   { id: 'subsolo', name: 'Subsolo Sessions: Deep House & Broken Beat', date: '2026-10-18', location: 'Galpão 04 - Distrito Industrial', price: 'R$ 40', tag: 'Shotgun', url: 'https://shotgun.live/pt-br' },
