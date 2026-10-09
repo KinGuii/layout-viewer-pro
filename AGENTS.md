@@ -8,3 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep the original Curadoria iframe mounted across workspace switches; this preserves its live state and existing storage behavior.
+- DJ Desk reads the existing library storage without writing to it; missing technical metadata stays unknown rather than being fabricated.
+- Keep Camelot normalization and transition filtering in the browser-safe dj-library module so matching rules are independently testable.
