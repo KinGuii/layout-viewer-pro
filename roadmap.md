@@ -5,6 +5,6 @@
 - [x] Implementar radar por BPM e harmonia, com testes e verificação visual.
 
 # Perfil Musical Pessoal
-- [ ] Mover acesso ao DJ Desk para a Página 4 e preservar navegação e acervo.
-- [ ] Implementar identidade com nove avatares, hábitos e conquistas reais.
-- [ ] Adicionar curiosidade diária, shows e exportação ao calendário; verificar fluxos.
+- [x] Mover acesso ao DJ Desk para a Página 4 e preservar navegação e acervo.
+- [x] Implementar identidade com nove avatares, hábitos e conquistas reais.
+- [x] Adicionar curiosidade diária, shows e exportação ao calendário; verificar fluxos.

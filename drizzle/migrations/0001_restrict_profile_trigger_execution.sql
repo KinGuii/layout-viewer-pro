@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.create_music_profile() FROM PUBLIC, anon, authenticated;
