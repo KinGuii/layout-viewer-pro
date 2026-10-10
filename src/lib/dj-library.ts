@@ -68,3 +68,19 @@ export function transitionMatches(source: DJTrack, tracks: DJTrack[], tolerance 
   return tracks.filter((track) => track.id !== source.id && track.bpm !== null && Math.abs(track.bpm - bpm) <= tolerance && harmonicMatch(source.key, track.key))
     .sort((a, b) => Math.abs((a.bpm ?? 0) - bpm) - Math.abs((b.bpm ?? 0) - bpm));
 }
+
+const SET_ROLE_ORDER = ["Opener", "Peak", "Closer"];
+export const NO_SET_ROLE = "Sem papel";
+
+/** Read-only grouping by the set role already stored per track: Opener, Peak, Closer, other roles, then unassigned; BPM ascending, unknown BPM last. */
+export function groupBySetRole(tracks: DJTrack[]): { role: string; tracks: DJTrack[] }[] {
+  const groups = new Map<string, DJTrack[]>();
+  for (const track of tracks) {
+    const role = track.setRole.trim() || NO_SET_ROLE;
+    groups.set(role, [...(groups.get(role) ?? []), track]);
+  }
+  const rank = (role: string) => role === NO_SET_ROLE ? 99 : (SET_ROLE_ORDER.indexOf(role) + 1 || 50);
+  return [...groups.entries()]
+    .sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b, "pt-BR"))
+    .map(([role, list]) => ({ role, tracks: [...list].sort((a, b) => (a.bpm ?? Infinity) - (b.bpm ?? Infinity)) }));
+}
