@@ -1,20 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MusicWorkspace } from "@/components/music-workspace";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Music Desk Pro — Diário, Perfil Musical & DJ Desk" },
-      { name: "description", content: "Seu diário e perfil musical pessoal: identidade, frequência de escuta, curiosidades, shows e DJ Desk com radar de transições." },
-      { property: "og:title", content: "Music Desk Pro — Diário, Perfil Musical & DJ Desk" },
-      { property: "og:description", content: "Sua identidade musical, hábitos e shows em um só Perfil, com acesso ao DJ Desk e ao seu acervo." },
+      { title: "Diário — Music Desk Pro" },
+      { name: "description", content: "Seu diário musical: faixas, micro-reviews sensoriais e acervo pessoal, com DJ Desk, Descobrir e Perfil." },
+      { property: "og:title", content: "Diário — Music Desk Pro" },
+      { property: "og:description", content: "Um diário e catálogo musical independente, com micro-reviews e acervo pessoal." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Index,
+  // The Diário itself is the original app, kept mounted by the workspace shell.
+  component: () => null,
 });
-
-function Index() {
-  return <MusicWorkspace />;
-}

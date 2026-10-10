@@ -30,3 +30,12 @@ describe("DJ Desk", () => {
   });
   it("normalizes musical keys to Camelot", () => { expect(camelotKey("Am")).toBe("8A"); expect(camelotKey("G major")).toBe("9B"); });
 });
+import { groupBySetRole, NO_SET_ROLE } from "@/lib/dj-library";
+describe("groupBySetRole", () => {
+  const t = (id: string, setRole: string, bpm: number | null) => ({ id, title: id, artist: "a", cover: null, bpm, key: "", energy: null, elements: [], mixTip: "", review: "", setRole });
+  it("orders Opener, Peak, Closer, then unassigned, with BPM ascending and unknown last", () => {
+    const groups = groupBySetRole([t("c", "Closer", 100), t("x", "", 90), t("p2", "Peak", 128), t("p1", "Peak", 124), t("pn", "Peak", null), t("o", "Opener", 110)]);
+    expect(groups.map(g => g.role)).toEqual(["Opener", "Peak", "Closer", NO_SET_ROLE]);
+    expect(groups[1].tracks.map(x => x.id)).toEqual(["p1", "p2", "pn"]);
+  });
+});
