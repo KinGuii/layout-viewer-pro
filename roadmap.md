@@ -14,3 +14,8 @@
 - [x] Adicionar artes abstratas, símbolo persistente e missões com XP testado.
 - [x] Atualizar agenda conceitual, mini player e cartão de Stories.
 - [x] Verificar navegação, persistência e apresentação em telas pequenas e grandes.
+# Etapa 1 — Navegação
+- [x] Menu único com rotas reais (Diário, DJ Desk, Descobrir, Perfil), mantendo o Diário original montado.
+- [x] DJ Desk com abas Biblioteca, Radar e Sets (somente leitura).
+- [x] Descobrir com Lançamentos e Recomendações do acervo real.
+- [x] Validar testes, navegação, acervo intacto e importar/exportar JSON.
