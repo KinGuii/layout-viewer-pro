@@ -22,7 +22,7 @@ export function MusicWorkspace({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<ProfileData>(defaultProfile), [userId, setUserId] = useState<string | null>(null);
   const [engagement, setEngagement] = useState<Engagement>(DEFAULT_ENGAGEMENT), [player, setPlayer] = useState<PlayerTrack | null>(null), [toast, setToast] = useState('');
   const iframe = useRef<HTMLIFrameElement>(null), activityRef = useRef<Activity[]>([]), userRef = useRef<string | null>(null), engagementRef = useRef<Engagement>(DEFAULT_ENGAGEMENT);
-  const baseline = useRef<{ ids: string[]; reviews: string[] } | null>(null), rawRef = useRef<string | null | undefined>(undefined);
+  const baseline = useRef<{ ids: string[]; reviews: string[] } | null>(null), rawRef = useRef<string | null | undefined>(undefined), libraryRef = useRef<ProfileLibrary>({ tracks: [], logDays: [] });
   useEffect(() => { if (!toast) return; const timer = setTimeout(() => setToast(''), 3500); return () => clearTimeout(timer); }, [toast]);
   const persistEngagement = useCallback((next: Engagement) => { engagementRef.current = next; setEngagement(next); try { localStorage.setItem(engagementKey(userRef.current), JSON.stringify(next)); } catch { setToast('As preferências não puderam ser guardadas neste navegador.'); } }, []);
   const award = useCallback((id: MissionId) => { const next = completeMission(engagementRef.current, id); if (next === engagementRef.current) return; persistEngagement(next); setToast(`+${MISSIONS.find(m => m.id === id)?.xp ?? 0} XP · Desafio concluído`); }, [persistEngagement]);
@@ -39,21 +39,21 @@ export function MusicWorkspace({ children }: { children: ReactNode }) {
       rawRef.current = raw;
       try {
         const data = JSON.parse(raw ?? '{}');
-        const next: ProfileLibrary = { tracks: Array.isArray(data.tracks) ? data.tracks : [], logDays: Array.isArray(data.logDays) ? data.logDays : [] }; setLibrary(next);
+        const next: ProfileLibrary = { tracks: Array.isArray(data.tracks) ? data.tracks : [], logDays: Array.isArray(data.logDays) ? data.logDays : [] }; libraryRef.current = next; setLibrary(next);
         const own = next.tracks.filter(t => !t.sample), ids = own.map(t => t.id), reviews = own.filter(t => t.review?.trim()).map(t => `${t.id}:${t.review}`);
         if (baseline.current) { if (ids.some(id => !baseline.current?.ids.includes(id))) { award('track'); award('catalog'); } if (reviews.some(review => !baseline.current?.reviews.includes(review))) award('review'); } baseline.current = { ids, reviews };
-      } catch { setLibrary({ tracks: [], logDays: [] }); }
+      } catch { libraryRef.current = { tracks: [], logDays: [] }; setLibrary(libraryRef.current); }
       buildDJTracks(raw);
     }
-    setLibrary(current => {
+    {
+      const current = libraryRef.current;
       const count = streakDays([...current.logDays, ...activityRef.current.map(a => a.day)], new Date());
       const doc = iframe.current?.contentDocument, streakButton = doc?.querySelector('header button[aria-label^="Crate Streak:"]');
       const symbol = streakButton?.querySelector('span[aria-hidden="true"]'), emoji = FREQUENCY_SYMBOLS[engagementRef.current.symbol]?.emoji ?? '🍍';
       if (symbol && symbol.textContent !== emoji) symbol.textContent = emoji;
       const number = streakButton?.querySelector('span:not([aria-hidden])'); if (number && number.textContent !== String(count)) number.textContent = String(count);
-      if (count >= 3) queueMicrotask(() => award('streak'));
-      return current;
-    });
+      if (count >= 3) award('streak');
+    }
   }, [award, buildDJTracks]);
 
   useEffect(() => {
