@@ -57,7 +57,13 @@ Página-base (sempre montada)
 - **Radar:** o painel de transição atual, com o controle de tolerância. No celular vira uma aba própria. No desktop continua ao lado da tabela.
 - **Sets:** uma visão somente de leitura das faixas agrupadas pelo papel já cadastrado (Opener, Peak, Closer, sem papel), em ordem de BPM. Não cria dados novos. O montador completo de sets fica para a Etapa 4.
 
-**Descobrir:** uma área nova e honesta, sem conteúdo falso. Ela mostra o que está por vir (pesquisa de artistas e álbuns, Blind Spot, cápsula mensal) e um atalho "Adicionar faixa" que leva ao cadastro do Diário. Se você preferir, ela pode ficar escondida até a Etapa 3.
+**Descobrir:** reaproveita os dados reais do acervo, sem avisos de "em breve" e sem simular nada.
+- **Lançamentos:** as faixas adicionadas mais recentemente.
+- **Recomendações:** as faixas com status "radar", ou seja, que estão esperando uma segunda escuta.
+- **Mesmos critérios do Diário:** a lista do Diário original não pode ser reaproveitada diretamente, porque está dentro do arquivo compilado. Por isso, os mesmos critérios ficam numa única regra pequena e testada, usada só pela área Descobrir.
+- **Ao tocar numa faixa:** ela abre no mini player, quando houver prévia de áudio, e um atalho leva ao Diário.
+- **Com o acervo vazio:** aparece um único convite para adicionar faixas no Diário.
+- **Espaço para o futuro:** a página é montada em seções independentes, para receber depois a pesquisa ampliada e o Blind Spot sem refazer nada.
 
 **Perfil:** a tela atual, sem mudança de conteúdo. Sai apenas o menu duplicado que hoje é desenhado dentro dela.
 
@@ -72,6 +78,7 @@ Página-base (sempre montada)
 | `src/routes/dj.tsx`, `perfil.tsx`, `descobrir.tsx` (novos) | Uma página por área, com título e descrição próprios |
 | `src/components/dj-desk.tsx` | Adiciona as abas Biblioteca, Radar e Sets, reaproveitando a tabela e o radar |
 | `src/lib/dj-library.ts` | Pequena regra de agrupamento por papel no set, com teste |
+| `src/lib/discovery.ts` (novo) + teste | Regras de Lançamentos e Recomendações (somente leitura) |
 | `src/components/music-profile.tsx` | O botão do DJ vira atalho para `/dj` |
 | `src/styles.css` | Estilos do menu único e das abas, com regra para esconder o menu original |
 | `src/test/app-routing.test.tsx`, `src/test/dj-library.test.ts` | Testes das 4 rotas e do agrupamento |
